@@ -9,8 +9,8 @@ module RubyLLM
         @schemas = []
       end
 
-      def collect(&)
-        instance_eval(&)
+      def collect(&block)
+        instance_eval(&block)
       end
 
       def string(**options)
@@ -33,8 +33,8 @@ module RubyLLM
         @schemas << Schema.build_property_schema(:null, **options)
       end
 
-      def object(...)
-        @schemas << Schema.build_property_schema(:object, ...)
+      def object(*args)
+        @schemas << Schema.build_property_schema(:object, *args)
       end
     end
   end

@@ -104,9 +104,9 @@ module RubyLLM
         end
       end
 
-      def define(name, &)
+      def define(name, &block)
         sub_schema = Class.new(Schema)
-        sub_schema.class_eval(&)
+        sub_schema.class_eval(&block)
 
         definitions[name] = {
           type: "object",
@@ -131,7 +131,7 @@ module RubyLLM
         @definitions ||= {}
       end
 
-      def build_property_schema(type, **options, &)
+      def build_property_schema(type, **options, &block)
         case type
         when :string
           {
@@ -165,7 +165,7 @@ module RubyLLM
           {type: "null", description: options[:description]}.compact
         when :object
           sub_schema = Class.new(Schema)
-          sub_schema.class_eval(&)
+          sub_schema.class_eval(&block)
 
           {
             type: "object",
@@ -196,17 +196,17 @@ module RubyLLM
         required_properties << name.to_sym if required
       end
 
-      def determine_array_items(of, &)
-        return collect_property_schemas_from_block(&).first if block_given?
+      def determine_array_items(of, &block)
+        return collect_property_schemas_from_block(&block).first if block_given?
         return build_property_schema(of) if primitive_type?(of)
         return reference(of) if of.is_a?(Symbol)
 
         raise InvalidArrayTypeError, of
       end
 
-      def collect_property_schemas_from_block(&)
+      def collect_property_schemas_from_block(&block)
         collector = PropertySchemaCollector.new
-        collector.collect(&)
+        collector.collect(&block)
         collector.schemas
       end
 
@@ -250,9 +250,9 @@ module RubyLLM
       self.class.valid?
     end
 
-    def method_missing(method_name, ...)
+    def method_missing(method_name, *args)
       if respond_to_missing?(method_name)
-        send(method_name, ...)
+        send(method_name, *args)
       else
         super
       end
