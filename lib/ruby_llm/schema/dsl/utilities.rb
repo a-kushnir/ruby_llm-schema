@@ -5,9 +5,9 @@ module RubyLLM
     module DSL
       module Utilities
         # Schema definition and reference methods
-        def define(name, &)
+        def define(name, &block)
           sub_schema = Class.new(Schema)
-          sub_schema.class_eval(&)
+          sub_schema.class_eval(&block)
 
           definitions[name] = {
             type: "object",

@@ -98,8 +98,8 @@ module RubyLLM
 
         private
 
-        def determine_array_items(of, &)
-          return collect_schemas_from_block(&).first if block_given?
+        def determine_array_items(of, &block)
+          return collect_schemas_from_block(&block).first if block_given?
           return send("#{of}_schema") if primitive_type?(of)
           return reference(of) if of.is_a?(Symbol)
           return schema_class_to_inline_schema(of) if schema_class?(of)
